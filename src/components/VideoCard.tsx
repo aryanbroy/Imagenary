@@ -14,7 +14,7 @@ interface VideoCardProps {
 }
 
 const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
-  const [isHovered, setHovered] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const [previewError, setPreviewError] = useState(false);
 
   const getThumbnailUrl = useCallback((publicId: string) => {
@@ -53,8 +53,8 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
 
   const formatDuration = useCallback((seconds: number) => {
     const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes} minute(s) and ${remainingSeconds} second(s)`;
+    const remainingSeconds = Math.round(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   }, []);
 
   const compressedPercentage = () => {
@@ -67,9 +67,38 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
   };
 
   return (
-    <div className="card bg-base-100 w-96 shadow-xl">
-      <figure onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
-        <img src={getThumbnailUrl(video.publicId)} alt="Shoes" />
+    <div
+      className="card bg-base-100 w-96 shadow-xl"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <figure className="aspect-video relative">
+        {isHovered ? (
+          previewError ? (
+            <div className="w-full h-full flex items-center justify-center">
+              <h1 className="text-center font-bold text-red-500">Error previewing video</h1>
+            </div>
+          ) : (
+            <video
+              src={getPreviewUrl(video.publicId)}
+              autoPlay
+              muted
+              loop
+              className="w-full h-full object-cover"
+            />
+          )
+        ) : (
+          <>
+            <img
+              src={getThumbnailUrl(video.publicId)}
+              alt={video.title}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute bottom-2 right-2 text-white text-sm bg-black bg-opacity-50 px-2 py-1 rounded">
+              {formatDuration(video.duration)}
+            </div>
+          </>
+        )}
       </figure>
       <div className="card-body space-y-4">
         <div>
