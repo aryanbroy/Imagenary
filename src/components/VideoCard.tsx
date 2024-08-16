@@ -135,7 +135,10 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
             </span>
           </div>
           <div>
-            <button className="btn btn-primary">
+            <button
+              className="btn btn-primary"
+              onClick={() => onDownload(video.publicId, video.title)}
+            >
               <Download />
             </button>
           </div>

@@ -1,34 +1,47 @@
 'use client';
 
 import VideoCard from '@/components/VideoCard';
-import React from 'react';
-
-const mockVideo = {
-  id: 'clzvqg43c0000kbif1evegzut',
-  title: 'testing',
-  description: 'testing desc',
-  publicId: 'imagenary-videos/mvxsxx2audkowobhaj5j',
-  originalSize: '574640',
-  compressedSize: '451340',
-  duration: 13.8,
-  createdAt: new Date('2024-08-15 20:28:21.035'),
-  updatedAt: new Date('2024-08-15 20:28:21.035'),
-};
+import { Video } from '@prisma/client';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 
 export default function Home() {
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const res = await axios.get('/api/videos');
+        const data = res.data;
+        setVideos(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchVideos();
+  }, []);
   const onDownload = (url: string, title: string) => {
-    console.log(url, title);
+    const videoUrl = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/${url}.mp4`;
+
+    window.open(videoUrl, '_blank');
+
+    // const link = document.createElement('a');
+    // link.href = videoUrl;
+    // link.download = `${title}.mp4`;
+    // document.body.appendChild(link);
+    // link.click();
+    // document.body.removeChild(link);
+    // console.log(url, title);
   };
   return (
     <div className="mt-4 space-y-4">
       <div>
         <h1 className="font-bold text-2xl">Videos</h1>
       </div>
-      <div>
-        <VideoCard
-          video={mockVideo}
-          onDownload={() => onDownload(mockVideo.publicId, mockVideo.title)}
-        />
+      <div className="flex flex-wrap gap-8">
+        {videos &&
+          videos.map((video) => <VideoCard key={video.id} video={video} onDownload={onDownload} />)}
       </div>
     </div>
   );
