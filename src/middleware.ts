@@ -11,6 +11,10 @@ export default clerkMiddleware((auth, req) => {
   const isAccessingHome = currentUrl.pathname === '/home'
   const isApiRequest = currentUrl.pathname.startsWith('/api')
 
+  if (currentUrl.pathname === '/') {
+    return NextResponse.redirect(new URL('/home', req.url));
+  }
+
   // when user is logged in
   if (userId && isPublicRoute(req) && !isAccessingHome) {
     return NextResponse.redirect(new URL('/home', req.url))
