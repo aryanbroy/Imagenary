@@ -16,12 +16,6 @@ export default function Page() {
         redirectUrlComplete: '/home',
         continueSignUp: true,
       });
-
-      await signIn?.authenticateWithRedirect({
-        strategy: 'oauth_google',
-        redirectUrl: '/sso-callback',
-        redirectUrlComplete: '/home',
-      });
     } catch (error) {
       console.log(error);
     }
