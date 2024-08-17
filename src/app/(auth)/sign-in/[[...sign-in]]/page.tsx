@@ -1,4 +1,6 @@
-import { SignIn } from '@clerk/nextjs'
+'use client';
+
+import { useSignIn } from '@clerk/nextjs';
 
 function GoogleImg() {
   return (
@@ -31,6 +33,19 @@ function GoogleImg() {
 }
 
 export default function Page() {
+  const { isLoaded, setActive, signIn } = useSignIn();
+
+  const signInWithGoogle = async () => {
+    try {
+      await signIn?.authenticateWithRedirect({
+        strategy: 'oauth_google',
+        redirectUrl: '/sso-callback',
+        redirectUrlComplete: '/',
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div className="flex justify-center container h-screen items-center">
       <div className="py-20 px-10 shadow-xl space-y-8 w-5/12">
@@ -39,7 +54,10 @@ export default function Page() {
           <p className="text-center text-slate-400">Please sign in to continue!</p>
         </div>
         <div className="flex justify-center items-center">
-          <button className="btn btn-wide btn-outline text-lg flex gap-6">
+          <button
+            onClick={signInWithGoogle}
+            className="btn btn-wide btn-outline text-lg flex gap-6"
+          >
             <GoogleImg /> Sign in with Google
           </button>
         </div>
