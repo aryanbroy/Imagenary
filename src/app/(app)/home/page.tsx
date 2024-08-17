@@ -11,12 +11,15 @@ export default function Home() {
 
   useEffect(() => {
     const fetchVideos = async () => {
+      setLoading(true);
       try {
         const res = await axios.get('/api/videos');
         const data = res.data;
         setVideos(data);
       } catch (error) {
         console.log(error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchVideos();
@@ -40,8 +43,12 @@ export default function Home() {
         <h1 className="font-bold text-2xl">Videos</h1>
       </div>
       <div className="flex flex-wrap gap-8">
-        {videos &&
-          videos.map((video) => <VideoCard key={video.id} video={video} onDownload={onDownload} />)}
+        {loading ? (
+          <span className="loading loading-spinner"></span>
+        ) : (
+          videos &&
+          videos.map((video) => <VideoCard key={video.id} video={video} onDownload={onDownload} />)
+        )}
       </div>
     </div>
   );

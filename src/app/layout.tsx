@@ -4,6 +4,7 @@ import './globals.css'
 import { ClerkProvider } from '@clerk/nextjs'
 import { Toaster } from '@/components/ui/sonner';
 import Sidebar from '@/components/Sidebar';
+import Header from '@/components/Header';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -20,7 +21,8 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={`${inter.className} dark h-screen`}>
+        <body className={`${inter.className} dark bg-base-200 h-full`}>
+          <Header />
           <div className="flex gap-8">
             <Sidebar />
             {children}
