@@ -1,8 +1,9 @@
 'use client';
 
 import { useSignIn } from '@clerk/nextjs';
+import Link from 'next/link';
 
-function GoogleImg() {
+export function GoogleImg() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -37,6 +38,9 @@ export default function Page() {
 
   const signInWithGoogle = async () => {
     try {
+      if (signIn) {
+        console.log(signIn);
+      }
       await signIn?.authenticateWithRedirect({
         strategy: 'oauth_google',
         redirectUrl: '/sso-callback',
@@ -56,9 +60,9 @@ export default function Page() {
         <div className="flex justify-center items-center">
           <button
             onClick={signInWithGoogle}
-            className="btn btn-wide btn-outline text-lg flex gap-6"
+            className="btn btn-block btn-outline text-lg flex gap-4"
           >
-            <GoogleImg /> Sign in with Google
+            <GoogleImg /> Continue with Google
           </button>
         </div>
         <div>
@@ -92,10 +96,15 @@ export default function Page() {
               <input type="password" className="grow" placeholder="Password" />
             </label>
 
-            <div>
+            <div className="space-y-1">
               <button type="submit" className="btn btn-primary w-full">
                 Sign In
               </button>
+              <div>
+                <Link className="link link-primary" href={'/sign-up'}>
+                  Dont have an account? Sign up
+                </Link>
+              </div>
             </div>
           </form>
         </div>
