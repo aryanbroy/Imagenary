@@ -1,10 +1,18 @@
 'use client';
 
-import { SignUp, useSignIn, useSignUp } from '@clerk/nextjs';
-import { GoogleImg } from '../../sign-in/[[...sign-in]]/page';
+import { useSignUp } from '@clerk/nextjs';
 import Link from 'next/link';
-import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
+import { GoogleImg } from '../../sign-in/[[...sign-in]]/page';
+import { z } from 'zod';
+
+const inputsSchema = z.object({
+  firstName: z.string().min(3, { message: 'Firstname must be at least 3 characters long' }),
+  lastName: z.string().min(3, { message: 'Lastname must be at least 3 characters long' }),
+  email: z.string().email(),
+  password: z.string().min(6, { message: 'Password must be at least 6 characters long' }),
+});
 
 export default function Page() {
   const { signUp, isLoaded, setActive } = useSignUp();
@@ -15,9 +23,30 @@ export default function Page() {
   const [password, setPassword] = useState('');
   const [pendingVerification, setPendingVerification] = useState(false);
   const [code, setCode] = useState('');
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
   const router = useRouter();
 
-  const signUpWithEmail = async () => {
+  useEffect(() => {
+    setErrors({});
+    try {
+      const res = inputsSchema.parse({
+        firstName,
+        lastName,
+        email,
+        password,
+      });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        err.errors.forEach((error) => {
+          setErrors((prev) => ({ ...prev, [error.path[0]]: error.message }));
+        });
+      }
+    }
+  }, [firstName, lastName, email, password]);
+
+  const signUpWithEmail = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setPendingVerification(true);
     try {
       await signUp?.create({
@@ -35,7 +64,8 @@ export default function Page() {
     }
   };
 
-  const verifyEmail = async () => {
+  const verifyEmail = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (!setActive || !code) {
       console.log('something is wrong here');
       return;
@@ -138,6 +168,9 @@ export default function Page() {
                     value={firstName}
                   />
                 </label>
+                {firstName.length > 0 && errors?.firstName && (
+                  <span className="mt-0 text-red-500 text-sm">{errors?.firstName}</span>
+                )}
 
                 <label className="input input-bordered flex items-center gap-2">
                   <svg
@@ -156,6 +189,9 @@ export default function Page() {
                     value={lastName}
                   />
                 </label>
+                {lastName && errors?.lastName && (
+                  <span className="mt-0 text-red-500 text-sm">{errors?.lastName}</span>
+                )}
 
                 <label className="input input-bordered flex items-center gap-2">
                   <svg
@@ -175,6 +211,9 @@ export default function Page() {
                     value={email}
                   />
                 </label>
+                {email && errors?.email && (
+                  <span className="mt-0 text-red-500 text-sm">{errors?.email}</span>
+                )}
 
                 <label className="input input-bordered flex items-center gap-2">
                   <svg
@@ -197,9 +236,16 @@ export default function Page() {
                     value={password}
                   />
                 </label>
+                {password && errors?.password && (
+                  <span className="mt-0 text-red-500 text-sm">{errors?.password}</span>
+                )}
 
                 <div className="space-y-1">
-                  <button type="submit" className="font-semibold text-lg btn btn-primary w-full">
+                  <button
+                    disabled={Object.values(errors).length > 0}
+                    type="submit"
+                    className="font-semibold text-lg btn btn-primary w-full"
+                  >
                     Sign Up
                   </button>
                   <div>
