@@ -1,10 +1,15 @@
 'use client';
 
 import { useSignIn } from '@clerk/nextjs';
-import { revalidatePath } from 'next/cache';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { z } from 'zod';
+
+const inputSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6, { message: 'Password must be at least 6 characters long' }),
+});
 
 export function GoogleImg() {
   return (
@@ -40,10 +45,24 @@ export default function Page() {
   const { isLoaded, setActive, signIn } = useSignIn();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const router = useRouter();
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  console.log(errors);
+  useEffect(() => {
+    setErrors({});
+    try {
+      const res = inputSchema.parse({ email, password });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        err.errors.forEach((error) => {
+          setErrors((prev) => ({ ...prev, [error.path[0]]: error.message }));
+        });
+      }
+    }
+  }, [email, password]);
 
   const signInWithEmail = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     try {
       const res = await signIn?.create({
         identifier: email,
@@ -106,6 +125,9 @@ export default function Page() {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </label>
+            {email.length > 0 && errors.email && (
+              <span className="mt-0 text-red-500 text-sm">{errors?.email}</span>
+            )}
 
             <label className="input input-bordered flex items-center gap-2">
               <svg
@@ -127,6 +149,9 @@ export default function Page() {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </label>
+            {password.length > 0 && errors.password && (
+              <span className="mt-0 text-red-500 text-sm">{errors?.password}</span>
+            )}
 
             <div className="space-y-1">
               <button type="submit" className="btn btn-primary w-full">
