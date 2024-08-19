@@ -46,7 +46,7 @@ export default function Page() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  console.log(errors);
+
   useEffect(() => {
     setErrors({});
     try {
