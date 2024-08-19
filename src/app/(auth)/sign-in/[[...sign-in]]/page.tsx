@@ -11,7 +11,7 @@ const inputSchema = z.object({
   password: z.string().min(6, { message: 'Password must be at least 6 characters long' }),
 });
 
-export function GoogleImg() {
+function GoogleImg() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
