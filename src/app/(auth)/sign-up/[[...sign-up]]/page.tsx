@@ -75,6 +75,8 @@ export default function Page() {
   }, [firstName, lastName, email, password]);
 
   const signUpWithEmail = async (e: React.FormEvent<HTMLFormElement>) => {
+    if (pendingVerification) return;
+    if (Object.values(errors).length > 0) return;
     e.preventDefault();
     setPendingVerification(true);
     try {
@@ -88,6 +90,7 @@ export default function Page() {
       await signUp?.prepareEmailAddressVerification({
         strategy: 'email_code',
       });
+      console.log('email sent');
     } catch (error) {
       console.log(error);
     }
@@ -273,7 +276,7 @@ export default function Page() {
                   <button
                     disabled={Object.values(errors).length > 0}
                     type="submit"
-                    className="font-semibold text-lg btn btn-primary w-full"
+                    className="font-semibold text-lg btn btn-primary w-full disabled:bg-blue-400 disabled:text-slate-950 disabled:cursor-pointer"
                   >
                     Sign Up
                   </button>

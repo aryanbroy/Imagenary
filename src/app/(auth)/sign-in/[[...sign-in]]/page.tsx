@@ -154,7 +154,11 @@ export default function Page() {
             )}
 
             <div className="space-y-1">
-              <button type="submit" className="btn btn-primary w-full">
+              <button
+                disabled={Object.values(errors).length > 0}
+                type="submit"
+                className="btn btn-primary w-full disabled:bg-blue-400 disabled:text-slate-950 disabled:cursor-wait"
+              >
                 Sign In
               </button>
               <div>
