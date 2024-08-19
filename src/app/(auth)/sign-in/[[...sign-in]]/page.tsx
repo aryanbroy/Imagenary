@@ -51,7 +51,7 @@ export default function Page() {
       });
 
       if (res?.status === 'complete') {
-        router.push('/home');
+        window.location.reload();
       }
     } catch (error) {
       console.log(error);
